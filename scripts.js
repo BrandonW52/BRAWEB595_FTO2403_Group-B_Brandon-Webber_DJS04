@@ -1,10 +1,13 @@
 // Imports data from data.js
 import { books, authors, genres, BOOKS_PER_PAGE } from "./data.js";
 
-import { BookHandler } from "./bookHandler.js";
+import { htmlElements } from "./utils/htmlElements.js";
+
+import { BookHandler } from "./utils/bookHandler.js";
 new BookHandler();
 
-import { htmlElements } from "./htmlElements.js";
+import { ThemeHandler } from "./utils/themeHandler.js";
+new ThemeHandler();
 
 let page = 1;
 let matches = books;
@@ -77,40 +80,6 @@ htmlElements.dataHeaderSettings.addEventListener("click", () => {
 htmlElements.dataListClose.addEventListener("click", () => {
   htmlElements.dataListActive.open = false;
 });
-
-// Checks user prefrance for color theme
-if (
-  window.matchMedia &&
-  window.matchMedia("(prefers-color-scheme: dark)").matches
-) {
-  let theme = "night";
-  toggleTheme(theme);
-} else {
-  let theme = "day";
-  toggleTheme(theme);
-}
-
-// Handles color theme change
-htmlElements.dataSettingsForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const { theme } = Object.fromEntries(formData);
-  toggleTheme(theme);
-
-  htmlElements.dataSettingsOverlay.open = false;
-});
-
-// Switches between Light and Dark themes
-function toggleTheme(theme) {
-  document.documentElement.style.setProperty(
-    "--color-dark",
-    theme === "night" ? "255, 255, 255" : "10, 10, 20"
-  );
-  document.documentElement.style.setProperty(
-    "--color-light",
-    theme === "night" ? "10, 10, 20" : "255, 255, 255"
-  );
-}
 
 // Create book preview elements
 function createBookPreviewElement({ author, id, image, title }) {

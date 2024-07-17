@@ -1,7 +1,10 @@
-import { books, authors, BOOKS_PER_PAGE } from "./data.js";
+// Imports data from data.js
+import { books, authors, BOOKS_PER_PAGE } from "../data.js";
 
+// Imports object from htmlElements.js
 import { htmlElements } from "./htmlElements.js";
 
+// Class constructor for creating book preview
 export class BookHandler {
   constructor() {
     this.page = 1;
@@ -14,6 +17,7 @@ export class BookHandler {
     );
   }
 
+  // Creates book element for html
   createBookElement({ author, id, image, title }) {
     const element = document.createElement("button");
     element.classList.add("preview");
@@ -30,6 +34,7 @@ export class BookHandler {
     return element;
   }
 
+  // Adds book preview to html
   addBookPreview() {
     const starting = document.createDocumentFragment();
     for (const book of this.matches.slice(0, BOOKS_PER_PAGE)) {
