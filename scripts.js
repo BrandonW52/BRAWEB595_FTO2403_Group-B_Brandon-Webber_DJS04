@@ -1,26 +1,35 @@
 // Imports data from data.js
 import { books, authors, genres, BOOKS_PER_PAGE } from "./data.js";
 
+// Imports html elements
 import { htmlElements } from "./utils/htmlElements.js";
 
+// Imports class constructor then calls it
 import { BookHandler } from "./utils/bookHandler.js";
 new BookHandler();
 
-import { ThemeHandler } from "./utils/themeHandler.js";
-new ThemeHandler();
+// Imports function then calls it
+import { themeHandler } from "./utils/themeHandler.js";
+
+import { loadEventListeners } from "./utils/eventListenerHandler.js";
 
 let page = 1;
 let matches = books;
 
 // Loads abstracted head meta data && Displays
 document.addEventListener("DOMContentLoaded", () => {
+  fetchHTMLMETA();
+  loadEventListeners();
+  themeHandler();
+});
+
+function fetchHTMLMETA() {
   fetch("./meta.html")
     .then((response) => response.text())
     .then((data) => {
       htmlElements.head.innerHTML = data;
-    })
-    .catch((error) => console.error("Error fetching meta.html"));
-});
+    });
+}
 
 // Creates option element
 function createOption(value, text) {
@@ -58,28 +67,6 @@ htmlElements.dataListButton.disabled = remainingBooks <= 0;
 htmlElements.dataListButton.innerText = `Show more (${
   books.length - BOOKS_PER_PAGE
 })`;
-
-// Handles Click events
-htmlElements.dataSearchCancel.addEventListener("click", () => {
-  htmlElements.dataSearchOverlay.open = false;
-});
-
-htmlElements.dataSettingsCancel.addEventListener("click", () => {
-  htmlElements.dataSettingsOverlay.open = false;
-});
-
-htmlElements.dataHeaderSearch.addEventListener("click", () => {
-  htmlElements.dataSearchOverlay.open = true;
-  htmlElements.dataSearchTitle.focus();
-});
-
-htmlElements.dataHeaderSettings.addEventListener("click", () => {
-  htmlElements.dataSettingsOverlay.open = true;
-});
-
-htmlElements.dataListClose.addEventListener("click", () => {
-  htmlElements.dataListActive.open = false;
-});
 
 // Create book preview elements
 function createBookPreviewElement({ author, id, image, title }) {
@@ -124,72 +111,3 @@ function updateBookList(result) {
     result.length === 0
   );
 }
-
-// Handles event listener for search form
-htmlElements.dataSearchForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const filters = Object.fromEntries(formData);
-  const result = books.filter((book) => {
-    const titleMatch =
-      filters.title.trim() === "" ||
-      book.title.toLowerCase().includes(filters.title.toLowerCase());
-    const authorMatch =
-      filters.author === "any" || book.author === filters.author;
-    const genreMatch =
-      filters.genre === "any" || book.genres.includes(filters.genre);
-
-    return titleMatch && authorMatch && genreMatch;
-  });
-
-  page = 1;
-  matches = result;
-  updateBookList(result);
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  htmlElements.dataSearchOverlay.open = false;
-});
-
-// Handles event listener to show more
-htmlElements.dataListButton.addEventListener("click", () => {
-  const fragment = document.createDocumentFragment();
-
-  for (const book of matches.slice(
-    page * BOOKS_PER_PAGE,
-    (page + 1) * BOOKS_PER_PAGE
-  )) {
-    const element = createBookPreviewElement(book);
-    fragment.appendChild(element);
-  }
-
-  htmlElements.dataListItems.appendChild(fragment);
-  page += 1;
-
-  htmlElements.dataListButton.disabled =
-    matches.length <= page * BOOKS_PER_PAGE;
-  htmlElements.dataListButton.innerHTML = `
-    <span>Show more</span>
-    <span class="list__remaining"> (${Math.max(
-      matches.length - page * BOOKS_PER_PAGE,
-      0
-    )})</span>
-  `;
-});
-
-// Handles event listener to show details of clicked book
-htmlElements.dataListItems.addEventListener("click", (event) => {
-  const previewId = event.target.closest(".preview")?.dataset.preview;
-  if (!previewId) return;
-
-  const activeBook = books.find((book) => book.id === previewId);
-  if (activeBook) {
-    htmlElements.dataListActive.open = true;
-    htmlElements.dataListBlur.src = activeBook.image;
-    htmlElements.dataListImage.src = activeBook.image;
-    htmlElements.dataListTitle.innerText = activeBook.title;
-    htmlElements.dataListSubtitle.innerText = `${
-      authors[activeBook.author]
-    } (${new Date(activeBook.published).getFullYear()})`;
-    htmlElements.dataListDescription.innerText = activeBook.description;
-  }
-});
