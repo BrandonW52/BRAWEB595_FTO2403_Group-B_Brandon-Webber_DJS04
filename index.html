@@ -7,8 +7,11 @@
 
     <title>Book Connect</title>
 
-    <script type="module" src="./scripts.js"></script>
+    
     <script type="module" src="./data.js"></script>
+    <script type="module" src="./utils/BookPreviewWebComponent.js"></script>
+    <script type="module" src="./scripts.js"></script>
+
   </head>
   <body>
 
@@ -72,7 +75,18 @@
     </header>
 
     <main class="list">
-      <div class="list__items" data-list-items></div>
+      <div class="list__items" data-list-items>
+        <!-- Template used by Web component -->
+        <template id="book-preview-template">
+          <button class="preview">
+              <img class="preview__image" />
+              <div class="preview__info">
+                  <h3 class="preview__title"></h3>
+                  <div class="preview__author"></div>
+              </div>
+          </button>
+      </template>
+      </div>
       <div class="list__message" data-list-message>No results found. Your filters might be too narrow.</div>
       <button class="list__button" data-list-button></button>
     </main>
@@ -138,7 +152,7 @@
         </div>
       </div>
     </dialog>
-    
+
     <div class="backdrop"></div>
   </body>
 </html>
